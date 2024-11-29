@@ -81,5 +81,5 @@ CREATE TABLE preliminary (
 );
 
 COPY preliminary 
-FROM 'C:\Users\kaileb\Desktop\Programming\Programs\CS336\Database\hmda_2017_nj_all-records_labels.csv'
+FROM 'C:\Users\kaileb\Desktop\Programming\Programs\CS336\Database\src\csv\hmda_2017_nj_all-records_labels.csv'
 DELIMITER ',' CSV HEADER QUOTE '"';

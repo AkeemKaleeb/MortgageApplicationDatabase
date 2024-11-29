@@ -112,4 +112,4 @@ COPY (
         lien_status ls ON f.application_id = ls.application_id
     JOIN 
         empty_table es ON f.application_id = es.application_id
-) TO 'C:\Users\kaileb\Desktop\Programming\Programs\CS336\Database\final_table.csv' WITH CSV HEADER;
+) TO 'C:\Users\kaileb\Desktop\Programming\Programs\CS336\Database\src\csv\final_table.csv' WITH CSV HEADER;
