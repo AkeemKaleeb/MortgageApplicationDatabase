@@ -1,12 +1,43 @@
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.Scanner;
+
+/*
+ * Ensure  postgresql JDBC jar is a part of class path or pom.xml
+ * pg_ctl restart -D "C:\Program Files\PostgreSQL\17\data"
+ */
 
 public class MortgageCLI {
     public static void main(String[] args) {
+        String url = "jdbc:postgresql://localhost:5432/mortgageapplication";
+        String user = "postgres";
+        String password = "admin";
+
+        // auto close connection
+        try (Connection conn = DriverManager.getConnection(url, user, password)) {
+            if (conn != null) {
+                System.out.println("Connected to the database!");
+                // Run Code
+            } else {
+                System.out.println("Failed to make connection!");
+            }
+
+        } catch (SQLException e) {
+            System.out.println("SQL State: " + e.getSQLState());
+            System.out.println("Error Code: " + e.getErrorCode());
+            System.out.println("Message: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+
+        // Initialize program
         Scanner scanner = new Scanner(System.in);
         boolean running = true;
 
         System.out.println("Welcome to the Mortgage Application.\n");
         while(running) {
+            // Prompt User
             System.out.println(
                 "Please choose an option:\n"
                 + "1. Add Filter\n"
@@ -15,22 +46,23 @@ public class MortgageCLI {
                 + "4. Exit\n"
             );
 
+            // Collect Input and Execute Instruction
             int option = scanner.nextInt();
             switch(option) {
-                case 1:
+                case 1:     // Add a Filter to the List
                     System.out.println("Add Filter\n");
                     break;
-                case 2:
+                case 2:     // Remove a Filter from the List 
                     System.out.println("Delete Filter\n");
                     break;
-                case 3:
+                case 3:     // Calculate the Rate of the Mortgage
                     System.out.println("Calculate Rate\n");
                     break;
-                case 4:
+                case 4:     // Exit the Program
                     System.out.println("Exiting...\n");
                     running = false;
                     break;
-                default:
+                default:    // Invalid Option/Error Handling
                     System.out.println("Invalid option\n");
             }
         }
