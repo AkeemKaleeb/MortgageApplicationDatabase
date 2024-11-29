@@ -1,0 +1,117 @@
+For this project, you will make an application that uses the database you created for project 1. 
+
+PART 1 
+--------------------------
+Backend (22.5 pts)
+
+The goal of this backend will be to use a command line interface to package mortgages into Mortgage Backed Securties. This packaging will have 3 main steps:
+
+1. Searching for mortgages
+2. Calculating the rate
+3. Packaging the mortgages
+
+For all steps only consider mortgages which were originated (action_taken is Loan originated) You can assume that you are able to sell loans that were either not sold, or sold to one of the following entities (we will assume that all of these entities will be willing to sell) : 
+0 -- Loan was not originated or was not sold in calendar year covered by register
+1 -- Fannie Mae (FNMA)
+2 -- Ginnie Mae (GNMA)
+3 -- Freddie Mac (FHLMC)
+4 -- Farmer Mac (FAMC)
+8 -- Affiliate institution
+
+For step 1, you should allow 6 different search parameters all of which can be combined (in other words you can filter by 2 different ones and only match the ones that fill both filters). For all of these, only expose the NAMES to the user whenever you have them (for example display the lean status name, not the code). The only exeption to this is MSAMD's without names, for which you can list the actual MSAMD. I list 7 filter types here of which you need to pick 5: 
+
+EXTRA CREDIT (1.5 pts): allow filtering by all 7:
+
+
+1. MSAMD, provide a list of msamd with names if they have them, or numbers if there is no name, the user should be able to pick any one or more of them. (allow list of acceptable MSAMD)
+2. Income to debt ratio, allow the user to select a minimum and/or maximum ratio of income to debt that they are willing to accept (for this project you can use applicant income / loan amount to compute this ratio).
+3. County (allow list of acceptable counties)
+4. loan_type (allow list of acceptable types)
+5. tract_to_msamd_income (again allow minimum and maximum)
+6. loan_purpose (allow list of acceptable types)
+7. property_type (allow list of acceptable types)
+
+Additionally, you should allow filtering by Owner Occupied.
+
+Once the user creates a filter, it should be displayed with a name indicating the filter such as "County = Orange county OR County = Essex County". You can format this name however you choose as long as it correctly indicates to the user which filters are active. This should be displayed at the base loop of the program. 
+
+The base loop of your program should be offering the user a choice of 3 options.  The program should also display the number of rows and loan amount sum matching the current filters. 
+
+The user should then have 3 options:Add filter, delete filter, or calculate rate. 
+
+Add filter will add a new filter which will work in addition to the other existing ones. Delete filter will delete an existing filter, offering a user a choice of which filters to delete there should also be a choice to delete all filters. Calculate rate will calculate the existing security return rate for the rows matching the user's existing filters (more on how to do this later).
+
+Calculating the rate:
+When the rate spread is unkown, you can assume missing rate spreads are equal to their maximum values: 
+    If the lien status equals 1 and the rate spread calculated is less than 1.5 percentage points, the result will be a rate spread equal to 'NA'.If the lien status equals 2 and the rate spread calculated is less than 3.5 percentage points, the result will be a rate spread equal to 'NA'. 
+ This means that, depending on lein status, you will either take the base apr and add 1.5 or 3.5. If the rate spread is known, simply use the rate spread + the base rate. 
+ For this project use a base rate of 2.33%. To compute the expected rate, use the weighted average of the rates in of all the mortgages selected, weighted by the loan amount. You should also compute the sum of all the mortgages as the cost of securitization.
+
+You should then compute the rate, and offer the user the option to accept or decline the rate and total cost. If the user accepts, change all the relevent purchaser_type to private securitization. and exit the program. If they reject, or the type change fails, then return to the main loop. 
+
+EXTRA CREDIT Transactions (1 pt)
+Do the rate calculation and change to the database as a serializable transaction (this can be done by ALTER DATABASE <DATABASE NAME> SET DEFAULT_TRANSACTION_ISOLATION TO SERIALIZABLE where database name is the name of the database; and conn.setAutoCommit(false) followed by explicit commits using the commit function on the JDBC side.)
+
+If postgres shows an error saying the something failed (for example, someone else is trying to securitize the same mortgages at the same time) report the error message to the user and return to the main loop of the program. If it succeeds exit the program.
+
+ PART 2 
+ ---------
+ Creating a new mortgage EXTRA CREDIT (5 pts):
+
+ You should additionally be able to add a new mortgage to your database. You should ask one question per column of the main application table. To simplify, you can simply ask them their income, loan amount, msamd, applicant sex , loan type and ethnicity. All other colums can be left null. For location, you can pick the first location with that msamd to assign to them. The java side should have a loop where the user selects one of the needed pecies of information, and then is prompted with the differnt options, as before only names should be exposed to the user. 
+
+ If you are doing this section, you will need an additional option in the main loop of the program for add mortgage, after which you should be prompted with your options.
+
+PART 3 
+--------
+Frontend (7.5 pts)
+
+For this part you need to create a frontend that allows the user to access the database. Unlike the rest of the course, this part should be done with the assitance of AI such as Microsoft copilot, ChatGPT4o or Claude3.5. I suggest you choose frontend technologies and decide how to proceed. If you need a place to start, a good standard is spring boot and react. (this will require installing Node as well to manage dependencies). The frontend should have the entire functionality of the command line interface. You can run the frontend locally, but you should be able to access it from a browser on the same machine. You may need to prompt the AI with more details and ask it about any errors you see. You can also feel free to use online guides, as long as you cite them and make sure you have the lisence to use their code (CC, MIT lisence or other one allowing non-comercial use). The goal of this part is to make the nicest frontend with the tools available. This is a link to generate a spring project https://start.spring.io/ (remember to select maven and add the postgres dependency and any others you may need you will then need to compile the project as before and run it with mvn spring-boot:run)
+
+
+Academic Dishonesty
+------------------
+
+Code coppied from anywhere will be dealt with according to the Rutgers Academic Dishonesty policy.
+If the copied code's source is referenced, the maximum penalty will be 75% off the given assingment, 
+and likely nothing depending on how much was copied and whether you had the license.
+
+It is OK to take code from official language documentation, but you should still cite it.
+
+AI is not permitted for the first part of the assingment, and will be treated the same way as any other code from an outside source. For the frontend, AI is encorages, but full chat logs must be provided.
+
+If the code is not cited, and makes up a substantial portion of the project, the MINIMUM penalty will be
+a zero on the assignment.
+
+README file
+-----------
+
+You must also submit a README file (named README.txt) with clearly
+delineated sections for the following. 
+
+
+0. Please write down the full names and netids of both your team members.
+1. Are there known issues or functions that aren't working currently in your
+   attached code? If so, explain. (note that you will get half credit for any reasonably sized bug that is fully explained in the readme)
+2. Collaboration: Who did you collaborate with on this project? What resources and refer-
+ences did you consult? Please also specify on what aspect of the project you collaborated or
+consulted.
+
+3. What are all the parts that you completed? Be sure to mention which extra credit you attempted here.
+
+4. What problems did you face developing code for this project? Around how long did you spend on this project (This helps me decide what I need to explain more clearly for the next projects)
+
+
+Submission
+----------
+
+
+Turn in your project on Canvas assignments. Only one team member should submit. 
+Please submit your final project as a single zip file with the exact following files inside it
+ (the readme should be a txt file)(Note caps in file and folder names).
+
+Project_2
+   -- the entire maven directory including the java code
+   -- Chat_log.txt the full chat log of your conversation with the AI about the frontend.
+    -- Presentation.mp4 a 5 minute presentation showing off your frontend (if you did not do a frontend, show off your command line instead for partial credit) Make sure to show how each type of filter works. I will accept volenteers in class to do this part live for extra credit. 
+   -- README.md
