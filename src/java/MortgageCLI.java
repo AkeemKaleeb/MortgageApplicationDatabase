@@ -40,6 +40,7 @@ public class MortgageCLI {
         while(running) {
             System.out.println("");
             filterManager.displayActiveFilters();
+            System.out.println(filterManager.getFilterQuery()); 
             System.out.println("");
             
             // Prompt User
