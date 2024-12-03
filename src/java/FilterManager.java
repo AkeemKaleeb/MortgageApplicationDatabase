@@ -79,6 +79,39 @@ public class FilterManager {
         filters.removeIf(filter -> filter.startsWith(filterType));
     }
 
+    // Remove a filter based on user input
+    public void removeFilterByType(int filterID) {
+        switch (filterID) {
+            case 1:
+                removeFilter("msamd IN");
+                break;
+            case 2:
+                removeFilter("applicant_income / loan_amount BETWEEN");
+                break;
+            case 3:
+                removeFilter("county IN");
+                break;
+            case 4:
+                removeFilter("loan_type IN");
+                break;
+            case 5:
+                removeFilter("tract_to_msamd_income BETWEEN");
+                break;
+            case 6:
+                removeFilter("loan_purpose IN");
+                break;
+            case 7:
+                removeFilter("property_type IN");
+                break;
+            case 8:
+                removeFilter("owner_occupied =");
+                break;
+            default:
+                System.out.println("Invalid filter option");
+                break;
+        }
+    }
+
     // Remove all filters from the list
     public void clearFilters() {
         filters.clear();

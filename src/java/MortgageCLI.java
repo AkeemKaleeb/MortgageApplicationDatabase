@@ -40,7 +40,7 @@ public class MortgageCLI {
         while(running) {
             System.out.println("");
             filterManager.displayActiveFilters();
-            System.out.println(filterManager.getFilterQuery()); 
+            // System.out.println(filterManager.getFilterQuery()); 
             System.out.println("");
             
             // Prompt User
@@ -53,8 +53,15 @@ public class MortgageCLI {
             );
 
             // Collect Input and Execute Instruction
-            int option = scanner.nextInt();
-            System.out.println("");
+            int option;
+            try {
+                option = Integer.parseInt(scanner.next());
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a number.");
+                continue;
+            }
+
+            System.out.print("\n");
             switch(option) {
                 case 1:     // Add a Filter to the List
                     System.out.println("Add Filter");
@@ -75,6 +82,20 @@ public class MortgageCLI {
                     break;
                 case 2:     // Remove a Filter from the List 
                     System.out.println("Delete Filter");
+                    System.out.println(
+                        "1. MSAMD\n"
+                        + "2. Income to Debt Ratio\n"
+                        + "3. County\n"
+                        + "4. Loan Type\n"
+                        + "5. Tract to MSAMD Income\n"
+                        + "6. Loan Purpose\n"
+                        + "7. Property Type\n"
+                        + "8. Owner Occupied"
+                    );
+
+                    int deleteOption = scanner.nextInt();
+                    filterManager.removeFilterByType(deleteOption);
+
                     break;
                 case 3:     // Calculate the Rate of the Mortgage
                     System.out.println("Calculate Rate");
@@ -87,5 +108,7 @@ public class MortgageCLI {
                     System.out.println("Invalid option");
             }
         }
+
+        scanner.close();
     }
 }
