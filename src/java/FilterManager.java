@@ -6,63 +6,74 @@ import java.util.Scanner;
 public class FilterManager {
     private List<String> filters = new ArrayList<>();
 
-    // Add a new filter to the list
     public void addFilter(int filterID) {
         Scanner scanner = new Scanner(System.in);
+        scanner.useDelimiter("\n");
         switch (filterID) {
-            case 1: {
+            case 1: { // MSAMD
                 System.out.println("Enter MSAMDs (comma separated): ");
                 String msamds = scanner.nextLine();
                 List<String> msamdList = Arrays.asList(msamds.split("\\s*,\\s*"));
                 addMSAMDFilter(msamdList);
                 break;
             }
-            case 2: {
-                System.out.println("Enter minimum income to debt ratio: ");
-                double minRatio = scanner.nextDouble();
-                System.out.println("Enter maximum income to debt ratio: ");
-                double maxRatio = scanner.nextDouble();
+            case 2: { // Income to Debt Ratio
+                System.out.println("Enter minimum income to debt ratio (or blank): ");
+                String minStr = scanner.nextLine().trim();
+                Double minRatio = minStr.isEmpty() ? null : Double.parseDouble(minStr);
+
+                System.out.println("Enter maximum income to debt ratio (or blank): ");
+                String maxStr = scanner.nextLine().trim();
+                Double maxRatio = maxStr.isEmpty() ? null : Double.parseDouble(maxStr);
+
                 addIncomeToDebtRatioFilter(minRatio, maxRatio);
                 break;
             }
-            case 3: {
+            case 3: { // County
                 System.out.println("Enter counties (comma separated): ");
                 String counties = scanner.nextLine();
                 List<String> countyList = Arrays.asList(counties.split("\\s*,\\s*"));
                 addCountyFilter(countyList);
                 break;
             }
-            case 4: {
+            case 4: { // Loan Type
                 System.out.println("Enter loan types (comma separated): ");
                 String loanTypes = scanner.nextLine();
                 List<String> loanTypeList = Arrays.asList(loanTypes.split("\\s*,\\s*"));
                 addLoanTypeFilter(loanTypeList);
                 break;
             }
-            case 5: {
-                System.out.println("Enter minimum tract to MSAMD income: ");
-                double minIncome = scanner.nextDouble();
-                System.out.println("Enter maximum tract to MSAMD income: ");
-                double maxIncome = scanner.nextDouble();
+            case 5: { // Tract to MSAMD Income
+                System.out.println("Enter minimum tract_to_msamd_income (or blank): ");
+                String minStr = scanner.nextLine().trim();
+                Double minIncome = minStr.isEmpty() ? null : Double.parseDouble(minStr);
+
+                System.out.println("Enter maximum tract_to_msamd_income (or blank): ");
+                String maxStr = scanner.nextLine().trim();
+                Double maxIncome = maxStr.isEmpty() ? null : Double.parseDouble(maxStr);
+
                 addTractToMSAMDIncomeFilter(minIncome, maxIncome);
                 break;
             }
-            case 6: {
-                System.out.println("Enter loan purpose:");
-                int loanPurposes = scanner.nextInt();
-                addLoanPurposeFilter(loanPurposes);
+            case 6: { // Loan Purpose
+                System.out.println("Enter loan purposes (comma separated): ");
+                String input = scanner.nextLine();
+                List<String> purposeList = Arrays.asList(input.split("\\s*,\\s*"));
+                addLoanPurposeFilter(purposeList);
                 break;
             }
-            case 7: {
-                System.out.println("Enter property types ");
-                int propertyType = scanner.nextInt();
-                addPropertyTypeFilter(propertyType);
+            case 7: { // Property Type
+                System.out.println("Enter property types (comma separated): ");
+                String input = scanner.nextLine();
+                List<String> propertyTypeList = Arrays.asList(input.split("\\s*,\\s*"));
+                addPropertyTypeFilter(propertyTypeList);
                 break;
             }
-            case 8: {
-                System.out.println("Enter owner occupancy: ");
-                int owner_occupancy = scanner.nextInt();
-                addOwnerOccupancyFilter(owner_occupancy);
+            case 8: { // Owner Occupied
+                System.out.println("Enter owner occupancy values (e.g. '1' for owner-occupied) (comma separated): ");
+                String input = scanner.nextLine();
+                List<String> ownerList = Arrays.asList(input.split("\\s*,\\s*"));
+                addOwnerOccupancyFilter(ownerList);
                 break;
             }
             default: {
@@ -72,37 +83,35 @@ public class FilterManager {
         }
     }
 
-    // Remove a filter from the list
     public void removeFilter(String filterType) {
-        filters.removeIf(filter -> filter.startsWith(filterType));
+        filters.removeIf(filter -> filter.contains(filterType));
     }
 
-    // Remove a filter based on user input
     public void removeFilterByType(int filterID) {
         switch (filterID) {
             case 1:
-                removeFilter("msamd IN");
+                removeFilter("msamd");
                 break;
             case 2:
-                removeFilter("applicant_income / loan_amount BETWEEN");
+                removeFilter("applicant_income_000s");
                 break;
             case 3:
-                removeFilter("county IN");
+                removeFilter("county_name");
                 break;
             case 4:
-                removeFilter("loan_type IN");
+                removeFilter("loan_type");
                 break;
             case 5:
-                removeFilter("tract_to_msamd_income BETWEEN");
+                removeFilter("tract_to_msamd_income");
                 break;
             case 6:
-                removeFilter("loan_purpose IN");
+                removeFilter("loan_purpose");
                 break;
             case 7:
-                removeFilter("property_type IN");
+                removeFilter("property_type");
                 break;
             case 8:
-                removeFilter("owner_occupied =");
+                removeFilter("owner_occupancy");
                 break;
             default:
                 System.out.println("Invalid filter option");
@@ -110,102 +119,87 @@ public class FilterManager {
         }
     }
 
-    // Remove all filters from the list
     public void clearFilters() {
         filters.clear();
     }
 
-    // Get the list of filters
-    public List<String> getFilters() {
-        return filters;
-    }
-
-    // Get the filters as an SQL query
-    public String getFilterQuery() {
+    public String getFilterConditions() {
         if (filters.isEmpty()) {
             return "";
         }
-        return " WHERE " + String.join(" AND ", filters);
+        return String.join(" AND ", filters);
     }
 
-    // MSAMD Filter
+    public String getFilterQuery() {
+        // Always include action_taken='1' (Loan originated)
+        String baseCondition = "action_taken='1'";
+        String conditions = getFilterConditions();
+
+        if (conditions.isEmpty()) {
+            return " WHERE " + baseCondition + " ";
+        } else {
+            return " WHERE " + baseCondition + " AND " + conditions + " ";
+        }
+    }
+
+    // Filter methods
+    private void addInFilter(String column, List<String> values) {
+        List<String> quoted = new ArrayList<>();
+        for (String v : values) {
+            quoted.add("'" + v + "'");
+        }
+        filters.add(column + " IN (" + String.join(", ", quoted) + ")");
+    }
+
     public void addMSAMDFilter(List<String> msamds) {
-        combineFilter("msamd IN", msamds);
+        addInFilter("msamd", msamds);
     }
 
-    // Add Income to Debt Ratio filter
-    public void addIncomeToDebtRatioFilter(double minRatio, double maxRatio) {
-        String newFilter = "applicant_income / loan_amount BETWEEN " + minRatio + " AND " + maxRatio;
-        combineFilter("applicant_income / loan_amount BETWEEN", newFilter);
+    public void addIncomeToDebtRatioFilter(Double minRatio, Double maxRatio) {
+        // Income to debt ratio = (applicant_income_000s * 1000)/(loan_amount_000s * 1000)
+        String field = "(applicant_income_000s::numeric * 1000.0)/(loan_amount_000s::numeric * 1000.0)";
+        List<String> conditions = new ArrayList<>();
+        if (minRatio != null) conditions.add(field + " >= " + minRatio);
+        if (maxRatio != null) conditions.add(field + " <= " + maxRatio);
+        if (!conditions.isEmpty()) {
+            filters.add(String.join(" AND ", conditions));
+        }
     }
 
-    // Add County filter
     public void addCountyFilter(List<String> counties) {
-        combineFilter("county_name IN", counties);
+        addInFilter("county_name", counties);
     }
 
-    // Add Loan Type filter
     public void addLoanTypeFilter(List<String> loanTypes) {
-        combineFilter("loan_type IN", loanTypes);
+        addInFilter("loan_type", loanTypes);
     }
 
-    // Add Tract to MSAMD Income filter
-    public void addTractToMSAMDIncomeFilter(double minIncome, double maxIncome) {
-        String newFilter = "tract_to_msamd_income BETWEEN " + minIncome + " AND " + maxIncome;
-        combineFilter("tract_to_msamd_income BETWEEN", newFilter);
+    public void addTractToMSAMDIncomeFilter(Double minIncome, Double maxIncome) {
+        List<String> conditions = new ArrayList<>();
+        if (minIncome != null) conditions.add("tract_to_msamd_income::numeric >= " + minIncome);
+        if (maxIncome != null) conditions.add("tract_to_msamd_income::numeric <= " + maxIncome);
+        if (!conditions.isEmpty()) filters.add(String.join(" AND ", conditions));
     }
 
-    // Add Loan Purpose filter
-    public void addLoanPurposeFilter(int loanPurpose) {
-        String newFilter = "loan_purpose = " + loanPurpose;
-        combineFilter("loan_purpose IN", newFilter);
+    public void addLoanPurposeFilter(List<String> loanPurposes) {
+        addInFilter("loan_purpose", loanPurposes);
     }
 
-    // Add Property Type filter
-    public void addPropertyTypeFilter(int propertyType) {
-        String newFilter = "property_type = " + propertyType;
-        combineFilter("property_type IN", newFilter);
+    public void addPropertyTypeFilter(List<String> propertyTypes) {
+        addInFilter("property_type", propertyTypes);
     }
 
-    // Add Owner Occupied filter
-    public void addOwnerOccupancyFilter(int owner_occupancy) {
-        String newFilter = "owner_occupancy = " + owner_occupancy;
-        combineFilter("owner_occupancy =", newFilter);
+    public void addOwnerOccupancyFilter(List<String> owner_occupancies) {
+        addInFilter("owner_occupancy", owner_occupancies);
     }
 
-    // Combine filters of the same type
-    private void combineFilter(String filterType, List<String> newValues) {
-        for (int i = 0; i < filters.size(); i++) {
-            if (filters.get(i).startsWith(filterType)) {
-                String existingValues = filters.get(i).substring(filters.get(i).indexOf("(") + 1, filters.get(i).indexOf(")"));
-                List<String> existingList = new ArrayList<>(Arrays.asList(existingValues.split(", ")));
-                existingList.addAll(newValues);
-                filters.set(i, filterType + " ('" + String.join("', '", existingList) + "')");
-                return;
-            }
-        }
-        filters.add(filterType + " ('" + String.join("', '", newValues) + "')");
-    }
-
-    // Combine filters of the same type for non-list filters
-    private void combineFilter(String filterType, String newFilter) {
-        for (int i = 0; i < filters.size(); i++) {
-            if (filters.get(i).startsWith(filterType)) {
-                filters.set(i, newFilter);
-                return;
-            }
-        }
-        filters.add(newFilter);
-    }
-
-    // Display active filters
     public void displayActiveFilters() {
         if (filters.isEmpty()) {
             System.out.println("No active filters.");
         } else {
             System.out.println("Active filters:");
             for (String filter : filters) {
-                System.out.println(filter);
+                System.out.println(" - " + filter);
             }
         }
     }

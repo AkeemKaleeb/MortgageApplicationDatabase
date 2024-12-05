@@ -9,35 +9,37 @@ public class DatabaseUpdater {
         this.conn = conn;
     }
 
-    public void updatePurchaserType(FilterManager fm) {
-        FilterManager filterManager = fm;
+    public boolean updatePurchaserType(String filterQuery) {
+        // Update purchaser_type to 'private securitization' in the final_table
+        String updateQuery = "UPDATE final_table SET purchaser_type = 'private securitization' " + filterQuery + ";";
 
-        // Get Query
-        String updateQuery = "UPDATE mortgages SET purchaser_type = 'private securization' WHERE " + filterManager.getFilterQuery();
-    
-        // Attempt to execute Query
         try {
-            conn.setAutoCommit(false);                   // Disable auto-commit
-            try(Statement statement = conn.createStatement()) {     // Execute the Query
-                statement.executeUpdate(updateQuery);
-            }
+            conn.commit(); // Commit any previous work
+            conn.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
+            conn.setAutoCommit(false); // Start transaction
 
-            conn.commit();                                          // Commit the transaction
-        }
-        catch(Exception e) {
-            try {
-                conn.rollback();                                    // Rollback any errors + Error Handling
+            try (Statement statement = conn.createStatement()) {
+                int updatedRows = statement.executeUpdate(updateQuery);
+                conn.commit();
+                System.out.println(updatedRows + " rows updated to private securitization.");
+                return true;
+            } catch (SQLException e) {
+                conn.rollback();
+                System.out.println("Update failed: " + e.getMessage());
+                return false;
             }
-            catch(SQLException rollbackException) {
+        } catch (Exception e) {
+            try {
+                conn.rollback();
+            } catch (SQLException rollbackException) {
                 rollbackException.printStackTrace();
             }
             e.printStackTrace();
-        }
-        finally {
+            return false;
+        } finally {
             try {
                 conn.setAutoCommit(true);
-            }
-            catch(SQLException e) {
+            } catch (SQLException e) {
                 e.printStackTrace();
             }
         }
