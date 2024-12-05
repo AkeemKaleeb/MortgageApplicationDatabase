@@ -82,8 +82,6 @@ CREATE TABLE preliminary (
 
 COPY preliminary 
 FROM '/Users/haris/working_dir/Mortgage-Application-Database/hmda_2017_nj_all-records_labels.csv'
-
-
 DELIMITER ',' CSV HEADER QUOTE '"';
 
 -- Drop existing tables if they exist
@@ -219,7 +217,7 @@ CREATE TABLE co_applicant_sex (
 
 CREATE TABLE purchaser_type (
     application_id INTEGER PRIMARY KEY,
-    purchaser_type VARCHAR(1),
+    purchaser_type VARCHAR(50),
     purchaser_type_name VARCHAR(100)
 );
 
@@ -253,7 +251,7 @@ CREATE TABLE empty_table (
     sequence_number VARCHAR(10)
 );
 
--- Insert data into normalized tables from preliminary table
+-- Insert data into normalized tables
 INSERT INTO agency (application_id, agency_code, agency_name, agency_abbr)
 SELECT application_id, agency_code, agency_name, agency_abbr FROM preliminary;
 
@@ -344,7 +342,7 @@ FROM preliminary;
 -- Drop existing tables if they exist
 DROP TABLE IF EXISTS final_table CASCADE;
 
--- Create the final table with foreign keys
+-- Create the final table with altered purchaser_type column
 CREATE TABLE final_table (
     application_id INTEGER PRIMARY KEY,
     as_of_year VARCHAR(4),
@@ -386,7 +384,7 @@ CREATE TABLE final_table (
     applicant_sex VARCHAR(1),
     co_applicant_sex VARCHAR(1),
     applicant_income_000s VARCHAR(10),
-    purchaser_type VARCHAR(1),
+    purchaser_type VARCHAR(50), -- Changed to VARCHAR(50)
     rate_spread VARCHAR(20),
     hoepa_status VARCHAR(1),
     lien_status VARCHAR(1),
@@ -423,6 +421,3 @@ JOIN purchaser_type pur ON a.application_id = pur.application_id
 JOIN hoepa_status hs ON a.application_id = hs.application_id
 JOIN lien_status ls ON a.application_id = ls.application_id
 JOIN empty_table empty_table ON a.application_id = empty_table.application_id;
-
-
-
