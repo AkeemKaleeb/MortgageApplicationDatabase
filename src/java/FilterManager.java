@@ -157,7 +157,7 @@ public class FilterManager {
 
     public void addIncomeToDebtRatioFilter(Double minRatio, Double maxRatio) {
         // Income to debt ratio = (applicant_income_000s * 1000)/(loan_amount_000s * 1000)
-        String field = "(applicant_income_000s::numeric * 1000.0)/(loan_amount_000s::numeric * 1000.0)";
+        String field = "applicant_income_000s / loan_amount_000s";
         List<String> conditions = new ArrayList<>();
         if (minRatio != null) conditions.add(field + " >= " + minRatio);
         if (maxRatio != null) conditions.add(field + " <= " + maxRatio);
