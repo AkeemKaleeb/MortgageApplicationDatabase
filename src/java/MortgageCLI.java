@@ -54,14 +54,14 @@ public class MortgageCLI {
                         case 1: // Add a Filter
                             System.out.println("Add Filter");
                             System.out.println(
-                                    "1. MSAMD\n"
-                                            + "2. Income to Debt Ratio\n"
-                                            + "3. County\n"
-                                            + "4. Loan Type\n"
-                                            + "5. Tract to MSAMD Income\n"
-                                            + "6. Loan Purpose\n"
-                                            + "7. Property Type\n"
-                                            + "8. Owner Occupied"
+                                      "1. MSAMD\n"
+                                    + "2. Income to Debt Ratio\n"
+                                    + "3. County\n"
+                                    + "4. Loan Type\n"
+                                    + "5. Tract to MSAMD Income\n"
+                                    + "6. Loan Purpose\n"
+                                    + "7. Property Type\n"
+                                    + "8. Owner Occupied"
                             );
                             int filterOption = scanner.nextInt();
                             filterManager.addFilter(filterOption);
@@ -69,15 +69,15 @@ public class MortgageCLI {
                         case 2: // Remove a Filter
                             System.out.println("Delete Filter");
                             System.out.println(
-                                    "1. MSAMD\n"
-                                            + "2. Income to Debt Ratio\n"
-                                            + "3. County\n"
-                                            + "4. Loan Type\n"
-                                            + "5. Tract to MSAMD Income\n"
-                                            + "6. Loan Purpose\n"
-                                            + "7. Property Type\n"
-                                            + "8. Owner Occupied\n"
-                                            + "0. Clear All"
+                                      "1. MSAMD\n"
+                                    + "2. Income to Debt Ratio\n"
+                                    + "3. County\n"
+                                    + "4. Loan Type\n"
+                                    + "5. Tract to MSAMD Income\n"
+                                    + "6. Loan Purpose\n"
+                                    + "7. Property Type\n"
+                                    + "8. Owner Occupied\n"
+                                    + "0. Clear All"
                             );
 
                             int deleteOption = scanner.nextInt();
@@ -139,7 +139,8 @@ public class MortgageCLI {
 
     private static void printFilteredResults(Connection conn, String filterQuery) {
         // final_table is the main table
-        String sql = "SELECT application_id, msamd, loan_type, loan_purpose, property_type, owner_occupancy, loan_amount_000s FROM final_table " + filterQuery;
+        String sql = "SELECT ft.application_id, ft.msamd, ft.loan_type, ft.loan_purpose, ft.property_type, ft.owner_occupancy, ft.loan_amount_000s, ft.county_name " +
+                 "FROM final_table ft " + filterQuery;
         try (Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
             boolean any = false;
             while (rs.next()) {
@@ -151,7 +152,8 @@ public class MortgageCLI {
                                 ", Loan Purpose: " + rs.getString("loan_purpose") +
                                 ", Property Type: " + rs.getString("property_type") +
                                 ", Owner Occupied: " + rs.getString("owner_occupancy") +
-                                ", Loan Amount: " + rs.getString("loan_amount_000s") + "000"
+                                ", Loan Amount: " + rs.getString("loan_amount_000s") + "000" +
+                                ", County: " + rs.getString("county_name")
                 );
             }
             if (!any) {
@@ -164,7 +166,8 @@ public class MortgageCLI {
     }
 
     private static void printCountAndSum(Connection conn, String filterQuery) {
-        String sql = "SELECT COUNT(*) AS cnt, SUM(loan_amount_000s::numeric) AS total_loan_amount FROM final_table " + filterQuery;
+        String sql = "SELECT COUNT(*) AS cnt, SUM(loan_amount_000s::numeric) " +
+                     "AS total_loan_amount FROM final_table ft " + filterQuery;
         try (Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
             if (rs.next()) {
                 long count = rs.getLong("cnt");

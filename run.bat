@@ -1,5 +1,12 @@
 @echo off
 
+rem Restart PSQL Server
+pg_ctl restart -D "C:\Program Files\PostgreSQL\17\data"
+if %errorlevel% neq 0 (
+    echo Failed to restart PostgreSQL server.
+    exit /b %errorlevel%
+)
+
 rem Delete existing compiled classes
 if exist bin (
     rd /s /q bin

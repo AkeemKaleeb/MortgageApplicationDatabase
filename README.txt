@@ -9,8 +9,8 @@ Haris Malik (hm569)
 
 Are there known issues or functions that aren't working currently in your attached code? 
 If so, explain. (note that you will get half credit for any reasonably sized bug that is fully explained in the readme)
-    - Currently, there is no frontend developed for this program. In addition to this, county sorting is providing issues likely due to the existance of the location table not being used as part of the full final table.
-        Lastly, when printing the results of the sorts, codes are still being provided when names should be provided instead.
+    - Currently, there is no frontend developed for this program.
+    - Lastly, when printing the results of the sorts, codes are still being provided when names should be provided instead.
 
 
 Collaboration: Who did you collaborate with on this project? What resources and references did you consult? 
@@ -33,3 +33,4 @@ What problems did you face developing code for this project? Around how long did
     - In total, each partner spent about 10 hours working to get the project working successfully.
     - The hardest parts were interfacing with the database via the new JDBC but that came with practice.
     - General usage of PostgreSQL still proved difficult, but came much easier this project than the last with more CL usage to interact with it.
+    - Knowledge of front end devlopment also proved difficult

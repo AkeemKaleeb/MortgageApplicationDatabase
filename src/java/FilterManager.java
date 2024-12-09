@@ -132,8 +132,10 @@ public class FilterManager {
 
     public String getFilterQuery() {
         // Always include action_taken='1' (Loan originated)
-        String baseCondition = "action_taken='1'";
+        String baseCondition = "ft.action_taken='1'";
         String conditions = getFilterConditions();
+
+        String joinClause = " Join location l ON ft.application_id = l.application_id ";
 
         if (conditions.isEmpty()) {
             return " WHERE " + baseCondition + " ";
@@ -167,7 +169,11 @@ public class FilterManager {
     }
 
     public void addCountyFilter(List<String> counties) {
-        addInFilter("county_name", counties);
+        List<String> quoted = new ArrayList<>();
+        for(String county : counties) {
+            quoted.add("'" + county + "'");
+        }
+        filters.add("ft.county_code IN (SELECT county_code FROM county WHERE county_name IN (" + String.join(", ", quoted) + "))");
     }
 
     public void addLoanTypeFilter(List<String> loanTypes) {
