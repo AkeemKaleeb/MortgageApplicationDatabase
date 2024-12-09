@@ -132,10 +132,8 @@ public class FilterManager {
 
     public String getFilterQuery() {
         // Always include action_taken='1' (Loan originated)
-        String baseCondition = "ft.action_taken='1'";
+        String baseCondition = "action_taken='1'";
         String conditions = getFilterConditions();
-
-        String joinClause = " Join location l ON ft.application_id = l.application_id ";
 
         if (conditions.isEmpty()) {
             return " WHERE " + baseCondition + " ";
@@ -159,7 +157,7 @@ public class FilterManager {
 
     public void addIncomeToDebtRatioFilter(Double minRatio, Double maxRatio) {
         // Income to debt ratio = (applicant_income_000s * 1000)/(loan_amount_000s * 1000)
-        String field = "applicant_income_000s / loan_amount_000s";
+        String field = "CAST(applicant_income_000s AS NUMERIC) / CAST(loan_amount_000s AS NUMERIC)";
         List<String> conditions = new ArrayList<>();
         if (minRatio != null) conditions.add(field + " >= " + minRatio);
         if (maxRatio != null) conditions.add(field + " <= " + maxRatio);
