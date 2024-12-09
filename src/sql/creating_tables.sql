@@ -81,7 +81,7 @@ CREATE TABLE preliminary (
 );
 
 COPY preliminary 
-FROM '/Users/haris/working_dir/Mortgage-Application-Database/hmda_2017_nj_all-records_labels.csv'
+FROM 'D:\Programming\School\Data Management\Project 2\hmda_2017_nj_all-records_labels.csv'
 DELIMITER ',' CSV HEADER QUOTE '"';
 
 -- Drop existing tables if they exist
@@ -344,7 +344,7 @@ DROP TABLE IF EXISTS final_table CASCADE;
 
 -- Create the final table with altered purchaser_type column
 CREATE TABLE final_table (
-    application_id INTEGER PRIMARY KEY,
+    application_id SERIAL PRIMARY KEY,
     as_of_year VARCHAR(4),
     respondent_id VARCHAR(20),
     agency_code VARCHAR(10),

@@ -2,3 +2,11 @@
 hmda_2017_nj_all-records_labels.csv
 .vscode/settings.json
 final_table.csv
+/bin
+*.class
+/bin
+bin/DatabaseUpdater.class
+bin/FilterManager.class
+bin/MortgageCLI.class
+bin/MortgageSearch.class
+bin/RateCalculator.class
