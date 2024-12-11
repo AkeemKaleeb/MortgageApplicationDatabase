@@ -81,7 +81,7 @@ CREATE TABLE preliminary (
 );
 
 COPY preliminary 
-FROM 'D:\Programming\School\Data Management\Project 2\hmda_2017_nj_all-records_labels.csv'
+FROM '/Users/haris/working_dir/Mortgage-Application-Database/hmda_2017_nj_all-records_labels.csv'
 DELIMITER ',' CSV HEADER QUOTE '"';
 
 -- Drop existing tables if they exist
@@ -217,7 +217,7 @@ CREATE TABLE co_applicant_sex (
 
 CREATE TABLE purchaser_type (
     application_id INTEGER PRIMARY KEY,
-    purchaser_type VARCHAR(50),
+    purchaser_type VARCHAR(1),
     purchaser_type_name VARCHAR(100)
 );
 
@@ -251,7 +251,6 @@ CREATE TABLE empty_table (
     sequence_number VARCHAR(10)
 );
 
--- Insert data into normalized tables
 INSERT INTO agency (application_id, agency_code, agency_name, agency_abbr)
 SELECT application_id, agency_code, agency_name, agency_abbr FROM preliminary;
 
@@ -336,34 +335,37 @@ CREATE TABLE location (
 
 CREATE INDEX idx_location_application_id ON location(application_id);
 
--- Insert unique locations into location table
 INSERT INTO location (application_id, county_code, msamd, state_code, census_tract_number, population, minority_population, hud_median_family_income, tract_to_msamd_income, number_of_owner_occupied_units, number_of_1_to_4_family_units)
 SELECT application_id, county_code, msamd, state_code, census_tract_number, population, minority_population, hud_median_family_income, tract_to_msamd_income, number_of_owner_occupied_units, number_of_1_to_4_family_units
 FROM preliminary;
 
--- Drop existing tables if they exist
 DROP TABLE IF EXISTS final_table CASCADE;
-
--- Create the final table with altered purchaser_type column
 CREATE TABLE final_table (
     application_id SERIAL PRIMARY KEY,
     as_of_year VARCHAR(4),
     respondent_id VARCHAR(20),
     agency_code VARCHAR(10),
     loan_type VARCHAR(1),
+    loan_type_name VARCHAR(75),
     property_type VARCHAR(1),
+    property_type_name VARCHAR(100),
     loan_purpose VARCHAR(1),
-    owner_occupancy VARCHAR(1),
+    loan_purpose_name VARCHAR(75),
+    owner_occupancy VARCHAR(10),
+    owner_occupancy_name VARCHAR(100),
     loan_amount_000s VARCHAR(10),
     preapproval VARCHAR(1),
     action_taken VARCHAR(1),
     msamd VARCHAR(20),
+    msamd_name VARCHAR(75),
     state_code VARCHAR(2),
     county_code VARCHAR(5),
     county_name VARCHAR(50),
     location_id INTEGER,
     applicant_ethnicity VARCHAR(1),
+    applicant_ethnicity_name VARCHAR(100),
     co_applicant_ethnicity VARCHAR(1),
+    co_applicant_ethnicity_name VARCHAR(100),
     applicant_race_1 VARCHAR(1),
     applicant_race_name_1 VARCHAR(100),
     applicant_race_2 VARCHAR(1),
@@ -385,9 +387,12 @@ CREATE TABLE final_table (
     co_applicant_race_5 VARCHAR(1),
     co_applicant_race_name_5 VARCHAR(100),
     applicant_sex VARCHAR(1),
+    applicant_sex_name VARCHAR(100),
     co_applicant_sex VARCHAR(1),
+    co_applicant_sex_name VARCHAR(100),
     applicant_income_000s VARCHAR(10),
-    purchaser_type VARCHAR(50), -- Changed to VARCHAR(50)
+    purchaser_type VARCHAR(50),
+    purchaser_type_name VARCHAR(100),
     rate_spread VARCHAR(20),
     hoepa_status VARCHAR(1),
     lien_status VARCHAR(1),
@@ -396,12 +401,50 @@ CREATE TABLE final_table (
     application_date_indicator VARCHAR(20)
 );
 
--- Insert data into final_table
 INSERT INTO final_table (
-    application_id, as_of_year, respondent_id, agency_code, loan_type, property_type, loan_purpose, owner_occupancy, loan_amount_000s, preapproval, action_taken, msamd, state_code, county_code, county_name, location_id, applicant_ethnicity, co_applicant_ethnicity, applicant_race_1, applicant_race_name_1, applicant_race_2, applicant_race_name_2, applicant_race_3, applicant_race_name_3, applicant_race_4, applicant_race_name_4, applicant_race_5, applicant_race_name_5, co_applicant_race_1, co_applicant_race_name_1, co_applicant_race_2, co_applicant_race_name_2, co_applicant_race_3, co_applicant_race_name_3, co_applicant_race_4, co_applicant_race_name_4, co_applicant_race_5, co_applicant_race_name_5, applicant_sex, co_applicant_sex, applicant_income_000s, purchaser_type, rate_spread, hoepa_status, lien_status, edit_status, sequence_number, application_date_indicator
+    application_id, as_of_year, respondent_id, agency_code,
+    loan_type, loan_type_name,
+    property_type, property_type_name,
+    loan_purpose, loan_purpose_name,
+    owner_occupancy, owner_occupancy_name,
+    loan_amount_000s, preapproval, action_taken,
+    msamd, msamd_name,
+    state_code, county_code, county_name,
+    location_id,
+    applicant_ethnicity, applicant_ethnicity_name,
+    co_applicant_ethnicity, co_applicant_ethnicity_name,
+    applicant_race_1, applicant_race_name_1, applicant_race_2, applicant_race_name_2,
+    applicant_race_3, applicant_race_name_3, applicant_race_4, applicant_race_name_4,
+    applicant_race_5, applicant_race_name_5, co_applicant_race_1, co_applicant_race_name_1,
+    co_applicant_race_2, co_applicant_race_name_2, co_applicant_race_3, co_applicant_race_name_3,
+    co_applicant_race_4, co_applicant_race_name_4, co_applicant_race_5, co_applicant_race_name_5,
+    applicant_sex, applicant_sex_name,
+    co_applicant_sex, co_applicant_sex_name,
+    applicant_income_000s, purchaser_type, purchaser_type_name,
+    rate_spread, hoepa_status, lien_status, edit_status, sequence_number, application_date_indicator
 )
 SELECT
-    a.application_id, lt.as_of_year, a.respondent_id, ag.agency_code, lt.loan_type, pt.property_type, lp.loan_purpose, oo.owner_occupancy, lt.loan_amount_000s, pr.preapproval, at.action_taken, m.msamd, s.state_code, c.county_code, c.county_name, l.location_id, ae.applicant_ethnicity, cae.co_applicant_ethnicity, ar.applicant_race_1, ar.applicant_race_name_1, ar.applicant_race_2, ar.applicant_race_name_2, ar.applicant_race_3, ar.applicant_race_name_3, ar.applicant_race_4, ar.applicant_race_name_4, ar.applicant_race_5, ar.applicant_race_name_5, car.co_applicant_race_1, car.co_applicant_race_name_1, car.co_applicant_race_2, car.co_applicant_race_name_2, car.co_applicant_race_3, car.co_applicant_race_name_3, car.co_applicant_race_4, car.co_applicant_race_name_4, car.co_applicant_race_5, car.co_applicant_race_name_5, asx.applicant_sex, casx.co_applicant_sex, a.applicant_income_000s, pur.purchaser_type, lt.rate_spread, hs.hoepa_status, ls.lien_status, empty_table.edit_status, empty_table.sequence_number, empty_table.application_date_indicator
+    a.application_id, lt.as_of_year, a.respondent_id, ag.agency_code,
+    lt.loan_type, lt.loan_type_name,
+    pt.property_type, pt.property_type_name,
+    lp.loan_purpose, lp.loan_purpose_name,
+    oo.owner_occupancy, oo.owner_occupancy_name,
+    lt.loan_amount_000s, pr.preapproval, at.action_taken,
+    m.msamd, m.msamd_name,
+    s.state_code, c.county_code, c.county_name,
+    l.location_id,
+    ae.applicant_ethnicity, ae.applicant_ethnicity_name,
+    cae.co_applicant_ethnicity, cae.co_applicant_ethnicity_name,
+    ar.applicant_race_1, ar.applicant_race_name_1, ar.applicant_race_2, ar.applicant_race_name_2,
+    ar.applicant_race_3, ar.applicant_race_name_3, ar.applicant_race_4, ar.applicant_race_name_4,
+    ar.applicant_race_5, ar.applicant_race_name_5,
+    car.co_applicant_race_1, car.co_applicant_race_name_1, car.co_applicant_race_2, car.co_applicant_race_name_2,
+    car.co_applicant_race_3, car.co_applicant_race_name_3, car.co_applicant_race_4, car.co_applicant_race_name_4,
+    car.co_applicant_race_5, car.co_applicant_race_name_5,
+    asx.applicant_sex, asx.applicant_sex_name,
+    casx.co_applicant_sex, casx.co_applicant_sex_name,
+    a.applicant_income_000s, pur.purchaser_type, pur.purchaser_type_name,
+    lt.rate_spread, hs.hoepa_status, ls.lien_status, empty_table.edit_status, empty_table.sequence_number, empty_table.application_date_indicator
 FROM applicant a
 JOIN agency ag ON a.application_id = ag.application_id
 JOIN loan_type lt ON a.application_id = lt.application_id
