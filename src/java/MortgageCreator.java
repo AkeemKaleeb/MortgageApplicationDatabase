@@ -12,7 +12,7 @@ public class MortgageCreator {
     public void addNewMortgage() {
         Scanner scanner = new Scanner(System.in);
 
-        System.out.println("Enter applicant income (integer): ");
+        System.out.println("Enter applicant income (in thousands): ");
         String incomeStr = scanner.nextLine().trim();
 
         System.out.println("Enter loan amount (in thousands): ");
@@ -100,9 +100,9 @@ public class MortgageCreator {
             ps.setInt(7, locationId);
             ps.setString(8, chosenEthCode);
             ps.setString(9, chosenEthName);
-            ps.setString(10, incomeStr);
-            ps.setString(11, chosenSexCode);
-            ps.setString(12, chosenSexName);
+            ps.setString(10, chosenSexCode);
+            ps.setString(11, chosenSexName);
+            ps.setString(12, incomeStr);
 
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -179,7 +179,7 @@ public class MortgageCreator {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        list.sort(Comparator.comparing(o->o.displayName));
+        list.sort(Comparator.comparing(o->o.displayName != null ? o.displayName : ""));
         return list;
     }
 

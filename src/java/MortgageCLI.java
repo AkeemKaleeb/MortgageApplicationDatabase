@@ -7,7 +7,7 @@ public class MortgageCLI {
     public static void main(String[] args) {
         String url = "jdbc:postgresql://localhost:5432/mortgageapplication";
         String user = "postgres";
-        String password = "ENTER YOUR PASSWORD!";
+        String password = "admin";
         
         try (Connection conn = DriverManager.getConnection(url, user, password)) {
             if (conn != null) {
@@ -355,7 +355,7 @@ public class MortgageCLI {
             e.printStackTrace();
         }
         // Sort by displayName
-        list.sort(Comparator.comparing(o->o.displayName));
+        list.sort(Comparator.comparing(o->o.displayName != null ? o.displayName : ""));
         return list;
     }
 

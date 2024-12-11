@@ -54,7 +54,7 @@ CREATE TABLE preliminary (
     applicant_sex VARCHAR(1),
     co_applicant_sex_name VARCHAR(100),
     co_applicant_sex VARCHAR(1),
-    applicant_income_000s VARCHAR(10),
+    applicant_income_000s VARCHAR(20),
     purchaser_type_name VARCHAR(100),
     purchaser_type VARCHAR(1),
     denial_reason_name_1 VARCHAR(75),
@@ -81,7 +81,7 @@ CREATE TABLE preliminary (
 );
 
 COPY preliminary 
-FROM '/Users/haris/working_dir/Mortgage-Application-Database/hmda_2017_nj_all-records_labels.csv'
+FROM 'D:\Programming\School\Data Management\Project 2\hmda_2017_nj_all-records_labels.csv'
 DELIMITER ',' CSV HEADER QUOTE '"';
 
 -- Drop existing tables if they exist
@@ -102,7 +102,7 @@ CREATE TABLE agency (
 CREATE TABLE applicant (
     application_id INTEGER PRIMARY KEY,
     respondent_id VARCHAR(20),
-    applicant_income_000s VARCHAR(10)
+    applicant_income_000s VARCHAR(20)
 );
 
 CREATE TABLE loan_type (
@@ -390,7 +390,7 @@ CREATE TABLE final_table (
     applicant_sex_name VARCHAR(100),
     co_applicant_sex VARCHAR(1),
     co_applicant_sex_name VARCHAR(100),
-    applicant_income_000s VARCHAR(10),
+    applicant_income_000s VARCHAR(20),
     purchaser_type VARCHAR(50),
     purchaser_type_name VARCHAR(100),
     rate_spread VARCHAR(20),
